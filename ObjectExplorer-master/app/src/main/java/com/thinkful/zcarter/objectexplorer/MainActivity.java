@@ -56,6 +56,19 @@ class Referee implements Observer {
     }
 }
 
+class Crowd implements Observer {
+
+    @Override
+    public void update(Observable observable, Object data) {
+        String[] parts = observable.getClass().toString().split("\\.");
+        String ballClass = parts[parts.length-1];
+        if ( ((Hardball)observable).isHomeRun ){
+            Screen.log("The " + ballClass + " cheers.");
+        }
+
+    }
+}
+
 abstract class Baseball extends Ball {
     protected float speed;
     public abstract void pitch();
@@ -73,14 +86,19 @@ class Softball extends Baseball {
         this.setChanged();
         this.notifyObservers();
     }
+
 }
 
 class Hardball extends Baseball {
+    boolean isHomeRun = false;
     public Hardball() {
        this.speed = 65;
     }
     public Hardball(float speed) {
         this.speed = speed;
+    }
+    public Hardball(Observer observer) {
+        this.addObserver(observer);
     }
 
     @Override
@@ -91,6 +109,13 @@ class Hardball extends Baseball {
     @Override
     public void roll() {
         Screen.log("This hard ball is rolling");
+        this.setChanged();
+        this.notifyObservers();
+    }
+
+    public void homerunHit(){
+        Screen.log("Home ground!");
+        isHomeRun = true;
         this.setChanged();
         this.notifyObservers();
     }
@@ -140,11 +165,21 @@ public class MainActivity extends Activity {
     }
 
     public void playBall() {
-        Hardball tryItBall = new Hardball(10);
+       /* Hardball tryItBall = new Hardball(10);
         tryItBall.pitch();
 
         SuperBall superBall = new SuperBall();
-        superBall.bounce();
+        superBall.bounce();*/
+
+        Referee firstUmpire = new Referee();
+        Crowd people = new Crowd();
+       // Referee secondUmpire = new Referee();
+        Hardball theBall = new Hardball(firstUmpire);
+       theBall.addObserver(people);
+
+       // Hardball theBall = new Hardball(people);
+      // theBall.roll();
+      theBall.homerunHit();
     }
 
     @Override
