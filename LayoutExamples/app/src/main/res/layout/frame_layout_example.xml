@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFFF00"/>
+
+    <View
+        android:layout_width="300px"
+        android:layout_height="300px"
+        android:background="#FF0000"/>
+    <View
+        android:layout_width="200px"
+        android:layout_height="200px"
+        android:background="#e5e5ff"/>
+    <View
+        android:layout_width="100px"
+        android:layout_height="100px"
+        android:background="#0000FF"/>
+</FrameLayout>
