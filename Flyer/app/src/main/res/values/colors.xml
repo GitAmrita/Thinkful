@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="editTextBg">#D3D3D3</color>
+    <color name="goBtn">#66CD00</color>
+    <color name="Bg">#fce1b7</color>
+    <color name="headerBg">#52d46a</color>
+    <color name="border">#000000</color>
+    <color name="white">#ffffff</color>
+    <color name="button">#0099CC</color>
+    <color name="flyerFooter">#6996AD</color>
+
+</resources>

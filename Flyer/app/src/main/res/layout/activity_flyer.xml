@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
+    android:background="@color/editTextBg"
+    tools:context="com.vogella.android.flyer.FlyerActivity">
+
+    <LinearLayout android:orientation="vertical"
+        android:id="@+id/flyer"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_weight=".2"
+        android:gravity="center_horizontal"
+        android:background="@color/white">
+
+        <TextView
+            android:id="@+id/headerBusiness"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            android:paddingBottom="2dp"
+            android:layout_marginLeft="5dp"
+            android:text="Mahalo Bowl Restaurant"
+            android:textSize="20dp" />
+
+        <TextView
+            android:id="@+id/headerAddress1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="2dp"
+            android:layout_marginLeft="5dp"
+            android:text="705a W Dana Street, Mountain View,"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/headerAddress2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="2dp"
+            android:layout_marginLeft="5dp"
+            android:text="CA 94041"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/headerPhone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:textSize="20dp"
+            android:layout_marginBottom="20dp"
+            android:text="(650) 450-8244" />
+
+        <ImageView
+
+            android:id="@+id/yelpImage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/splash_2"/>
+
+        <TextView
+            android:id="@+id/yelpRating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textSize="15dp"
+            android:layout_marginTop="5dp"
+            android:text="Yelp Rating:" />
+
+        <RatingBar
+            android:id="@+id/ratingBar"
+            style="@style/customRatingBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:paddingBottom="5dp"/>
+
+        <TextView
+            android:id="@+id/yelpReview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textSize="14dp"
+            android:text="0 reviews" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/flyerFooter"
+            android:orientation="vertical"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:id="@+id/hoursOfOperation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:layout_marginLeft="5dp"
+                android:text="Hours of Operation"
+                android:gravity="center_horizontal"
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/timingWeekdays"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:paddingTop="2dp"
+                android:textSize="15dp" />
+
+            <TextView
+                android:id="@+id/timingSaturday"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:paddingTop="2dp"
+                android:textSize="15dp" />
+
+            <TextView
+                android:id="@+id/timingSunday"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="4dp"
+                android:textSize="15dp" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout android:id="@+id/textLayout"
+        android:orientation="vertical" android:layout_height="fill_parent"
+        android:layout_width="fill_parent" android:layout_weight=".8">
+
+        <Button
+            android:id="@+id/shareBtnOnClick"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Share"
+            android:onClick="onClick"
+            android:background="@color/button"/>
+    </LinearLayout>
+
+</LinearLayout>

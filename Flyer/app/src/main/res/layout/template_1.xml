@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/Bg">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_margin="30dp"
+        android:background="#f2f2f2"
+        android:id="@+id/template">
+
+        <LinearLayout
+            android:id="@+id/header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/headerBg">
+
+            <TextView
+                android:id="@+id/headerBusiness"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:textAllCaps="true"
+                android:gravity="center_horizontal"
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/headerAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_below="@+id/headerBusiness"
+                android:textSize="15dp" />
+
+            <TextView
+                android:id="@+id/headerPhone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_below="@+id/headerAddress"
+                android:textSize="15dp"
+                android:paddingBottom="10dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_below="@+id/header">
+
+            <LinearLayout
+                android:id="@+id/leftImage"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_weight="0.7"
+                android:layout_alignParentLeft="true">
+
+                <ImageView
+                    android:id="@+id/image1"
+                    android:layout_width="300dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/splash_1"
+                    android:background="@color/border"
+                    android:paddingRight="3dp"
+                    android:layout_marginBottom="10dp"/>
+
+                <ImageView
+                    android:id="@+id/image2"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:src="@drawable/splash_2"
+                    android:background="@color/border"
+                    android:paddingRight="3dp"
+                    android:layout_marginBottom="10dp"/>
+
+                <ImageView
+                    android:id="@+id/image3"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:src="@drawable/splash_3"
+                    android:background="@color/border"
+                    android:paddingRight="3dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#f7ffe5"
+                android:layout_weight="0.3"
+                android:orientation="vertical"
+                android:layout_alignParentRight="true">
+
+                <TextView
+                    android:id="@+id/review1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="15dp"
+                    android:text="Lorem ipsum dolor sit amet, consectetur adipisicing elit, s nisi ut aliquip ex ea commodo consequat."
+                    android:textSize="15dp" />
+
+                <TextView
+                    android:id="@+id/review2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=" do eiusmod tempor incididunad minim veniam, qaliquip ex ea commodo consequat."
+                    android:padding="15dp"
+                    android:textSize="15dp" />
+
+                <TextView
+                    android:id="@+id/hours"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Hours of Operation"
+                    android:paddingLeft="15dp"
+                    android:textSize="15dp" />
+
+                <TextView
+                    android:id="@+id/weekdayHours"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Mon-Fri: 9am - 5pm"
+                    android:textSize="15dp"
+                    android:paddingLeft="15dp" />
+
+                <TextView
+                    android:id="@+id/satHours"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Sat: 9am - 2pm"
+                    android:textSize="15dp"
+                    android:paddingLeft="15dp" />
+
+                <TextView
+                    android:id="@+id/sunHours"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Sunday: closed"
+                    android:textSize="15dp"
+                    android:paddingLeft="15dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/go"
+        android:layout_gravity="right"
+        android:text="@string/go"
+        android:background="@color/goBtn" />
+
+</LinearLayout>
