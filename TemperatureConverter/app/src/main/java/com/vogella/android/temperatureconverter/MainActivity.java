@@ -7,6 +7,8 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+
 public class MainActivity extends AppCompatActivity {
 
     private EditText text;
@@ -16,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         text = (EditText) findViewById(R.id.inputValue);
+        initDisplayConfig();
     }
 
     public void onClick(View view) {
@@ -43,6 +46,11 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
         }
+    }
+
+    private void initDisplayConfig() {
+        int memory = (int) Runtime.getRuntime().maxMemory() / 4;
+        ImageLoader.getInstance().init(ConverterUtil.getConfiguration(this, memory));
     }
 }
 
