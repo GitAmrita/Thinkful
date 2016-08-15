@@ -17,6 +17,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -27,10 +28,10 @@ import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
 
-    public final static String REVIEW = "";
-    public final static String YELP_BUSINESS = "";
-    public final static  String YELP_ACCESS_TOKEN=
-            "uf14Cl5SXkVdkjHxgfGzm6TumSgm_RqZoUZOeBrkJs0PAzl48WtZH8HswY6eNfauEVMsWmntUnnNS03bGDZ8U8NPaeJT8LbbhzP-7B1fIDM9iJTgZtLEOBG6iCKpV3Yx";
+    public final static  String YELP_BUSINESS = "";
+    public final static  String YELP_SECRET_KEY = "0i0nf5Y4C40qcUMfHrmOKeU2fq4A99hFAcEa4tQNlihVtuON97PnXrqTPEoKOdNK";
+    public final static  String YELP_CLIENT_ID = "pho1XNCTeRxQVzWR_5vacg";
+    public final static  String YELP_AUTH_URL = "https://api.yelp.com/oauth2/token";
 
     @Bind(R.id.yelpUrl)
     protected EditText yelpUrlEditText;
@@ -49,12 +50,13 @@ public class MainActivity extends AppCompatActivity {
         webserviceTask.execute(yelpUrl);
     }
 
-    private class YelpResultTask extends AsyncTask<String, String, Yelp>{
+    private class YelpResultTask extends AsyncTask<String, String, Yelp> {
 
         @Override
         protected Yelp doInBackground(String... params) {
-            ArrayList<Review> yelpReviews = getYelpReviews();
-            BusinessDetail yelpBusiness = getYelpBusinessData();
+            String accessToken =  getYelpAccessToken();
+            BusinessDetail yelpBusiness = getYelpBusinessData(accessToken);
+            ArrayList<Review> yelpReviews = getYelpReviews(accessToken);
             return new Yelp(yelpBusiness, yelpReviews);
         }
 
@@ -65,7 +67,33 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
-        private BusinessDetail getYelpBusinessData(){
+        private String getYelpAccessToken() {
+            HttpURLConnection urlConnection = null;
+            String postParameters = "grant_type=client_credentials&client_secret="
+                    + YELP_SECRET_KEY + "&client_id=" + YELP_CLIENT_ID;
+            try {
+                URL url = new URL(YELP_AUTH_URL);
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setDoOutput(true);
+                urlConnection.setRequestMethod("POST");
+                urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                urlConnection.setFixedLengthStreamingMode(postParameters.getBytes().length);
+                PrintWriter out = new PrintWriter(urlConnection.getOutputStream());
+                out.print(postParameters);
+                out.close();
+                JSONObject json = readInputStream(urlConnection.getInputStream());
+                return parseAccessToken(json);
+            } catch (IOException e) {
+                Log.e("bapi", "Error ", e);
+                return "";
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+            }
+        }
+
+        private BusinessDetail getYelpBusinessData(String accessToken) {
             HttpURLConnection urlConnection = null;
 
             try {
@@ -74,8 +102,9 @@ public class MainActivity extends AppCompatActivity {
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
-                urlConnection.setRequestProperty("Authorization", "Bearer " + YELP_ACCESS_TOKEN);
-                return parseYelpData(urlConnection.getInputStream());
+                urlConnection.setRequestProperty("Authorization", "Bearer " + accessToken);
+                JSONObject json = readInputStream(urlConnection.getInputStream());
+                return parseYelpData(json);
             } catch (IOException e) {
                 Log.e("MainActivity", "Error ", e);
             } finally {
@@ -86,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
             return null;
         }
 
-        private ArrayList<Review> getYelpReviews(){
+        private ArrayList<Review> getYelpReviews(String accessToken) {
             HttpURLConnection urlConnection = null;
 
             try {
@@ -95,8 +124,9 @@ public class MainActivity extends AppCompatActivity {
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
-                urlConnection.setRequestProperty("Authorization", "Bearer " + YELP_ACCESS_TOKEN);
-                return parseYelpReview(urlConnection.getInputStream());
+                urlConnection.setRequestProperty("Authorization", "Bearer " + accessToken);
+                JSONObject json = readInputStream(urlConnection.getInputStream());
+                return parseYelpReview(json);
             } catch (IOException e) {
                 Log.e("MainActivity", "Error ", e);
             } finally {
@@ -108,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    protected BusinessDetail parseYelpData(InputStream in) {
+    protected JSONObject readInputStream(InputStream in) {
         StringBuilder stringBuilder = new StringBuilder();
         BufferedReader bufferedReader = null;
         try {
@@ -117,11 +147,10 @@ public class MainActivity extends AppCompatActivity {
             while ((line = bufferedReader.readLine()) != null) {
                 stringBuilder.append(line + "\n");
             }
-            JSONObject yelp = new JSONObject(stringBuilder.toString());
-            BusinessDetail y = new BusinessDetail();
-            return y.parseBusinessDetail(yelp);
+            return new JSONObject(stringBuilder.toString());
         } catch (Exception e) {
             Log.e("MainActivity", "Error", e);
+            return null;
         } finally {
             if (bufferedReader != null) {
                 try {
@@ -130,53 +159,32 @@ public class MainActivity extends AppCompatActivity {
                     Log.e("PlaceholderFragment", "Error closing stream", e);
                 }
             }
-        }
-        return null;
 
+        }
     }
 
-    protected ArrayList<Review> parseYelpReview(InputStream in) {
-        StringBuilder stringBuilder = new StringBuilder();
-        BufferedReader bufferedReader = null;
+    protected BusinessDetail parseYelpData(JSONObject yelp) {
+        BusinessDetail y = new BusinessDetail();
+        return y.parseBusinessDetail(yelp);
+    }
+
+    protected ArrayList<Review> parseYelpReview(JSONObject reviewJson) {
         try {
-            bufferedReader = new BufferedReader(new InputStreamReader(in));
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                stringBuilder.append(line + "\n");
-            }
-            JSONObject reviewJson = new JSONObject(stringBuilder.toString());
-            if (reviewJson.has("reviews")) {
-                JSONArray reviewArray = reviewJson.getJSONArray("reviews");
-                return reviewArray.length() >  0 ? new Review().parseReviews(reviewArray) : null;
-            }
-        } catch (Exception e) {
-            Log.e("MainActivity", "Error", e);
-        } finally {
-            if (bufferedReader != null) {
-                try {
-                    bufferedReader.close();
-                } catch (final IOException e) {
-                    Log.e("PlaceholderFragment", "Error closing stream", e);
-                }
-            }
-        }
-        return null;
-    }
+            JSONArray reviewArray = reviewJson.getJSONArray("reviews");
+            return reviewArray.length() >  0 ? new Review().parseReviews(reviewArray) : null;
+        } catch(Exception e) {
+            return null;
 
-    protected void setReviewIntent(ArrayList<Review> review){
-        if (review != null && review.size() > 0) {
-            Intent intent = new Intent(this, FlyerActivity.class);
-            intent.putExtra(REVIEW, review);
-            startActivity(intent);
         }
     }
 
-    protected void setYelpBusiness(BusinessDetail business){
-        if (business != null) {
-            Intent intent = new Intent(this, FlyerActivity.class);
-            intent.putExtra(YELP_BUSINESS, business);
-            startActivity(intent);
+    protected String parseAccessToken(JSONObject json) {
+        try {
+            return json.get("access_token").toString();
+        } catch(Exception e) {
+            Log.e("PlaceholderFragment", "Error closing stream", e);
         }
+        return "";
     }
 
     protected void setYelpIntent(Yelp business){

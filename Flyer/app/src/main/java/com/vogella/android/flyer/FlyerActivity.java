@@ -1,11 +1,15 @@
 package com.vogella.android.flyer;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -16,9 +20,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.io.InputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -72,7 +77,6 @@ public class FlyerActivity extends AppCompatActivity {
     private BusinessDetail mBusiness;
     private ArrayList<Review> mReviews;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,12 +88,94 @@ public class FlyerActivity extends AppCompatActivity {
         setYelpImages(mBusiness);
         setYelpRatings(mBusiness);
         setHoursOfOperation(mBusiness);
+        Typeface oswald = Typeface.createFromAsset(getAssets(),"fonts/Oswald-Regular.ttf");
+        businessName.setTypeface(oswald);
+        businessAddress1.setTypeface(oswald);
+        businessAddress2.setTypeface(oswald);
+        businessPhone.setTypeface(oswald);
+        yelpReview.setTypeface(oswald);
     }
 
     @OnClick(R.id.shareBtnOnClick)
     public void onClick() {
-        Toast.makeText(getBaseContext(), "Landen: Your code goes here",
-                Toast.LENGTH_LONG).show();
+        shareItWrapper();
+    }
+    private void saveJpeg(){
+        layout.setDrawingCacheEnabled(true);
+        layout.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        layout.layout(0, 0, layout.getMeasuredWidth(), layout.getMeasuredHeight());
+        layout.buildDrawingCache(true);
+        Bitmap b = Bitmap.createBitmap(layout.getDrawingCache());
+        layout.setDrawingCacheEnabled(false); // clear drawing cache
+
+        File dir = new File(Environment.getExternalStorageDirectory() + File.separator + "Pictures");
+
+        boolean doSave = true;
+        if (!dir.exists()) {
+            doSave = dir.mkdirs();
+        }
+
+        if (doSave) {
+            saveBitmapToFile(dir,"flyer.jpg",b,Bitmap.CompressFormat.JPEG,100);
+        }
+        else {
+            Log.e("app","Couldn't create target directory.");
+        }
+    }
+
+    private void shareIt() {
+        //sharing implementation here
+        saveJpeg();
+        String shareBody = "Here is the share content body";
+        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+        sharingIntent.setType("image/jpeg");
+        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "I am Doge!");
+        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, "Bork bork bork.");
+        String imagePath = Environment.getExternalStorageDirectory()+ File.separator + "Pictures" + File.separator + "flyer.jpg";
+        File imageFileToShare = new File(imagePath);
+        Uri uri = Uri.fromFile(imageFileToShare);
+        sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        startActivity(Intent.createChooser(sharingIntent, "Share your string using"));
+    }
+
+    private void shareItWrapper() {
+        try {
+            int REQUEST_CODE_ASK_PERMISSIONS = 123;
+            int hasWriteExternalStoragePermission = checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            if (hasWriteExternalStoragePermission != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        REQUEST_CODE_ASK_PERMISSIONS);
+                return;
+            }
+            shareIt();
+        } catch(NoSuchMethodError e) {
+            shareIt();
+        }
+    }
+
+    public boolean saveBitmapToFile(File dir, String fileName, Bitmap bm,
+                                    Bitmap.CompressFormat format, int quality) {
+
+        File imageFile = new File(dir,fileName);
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(imageFile);
+            bm.compress(format,quality,fos);
+            fos.close();
+            return true;
+        }
+        catch (IOException e) {
+            Log.e("app",e.getMessage());
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        }
+        return false;
     }
 
     private void calculateLayoutDimensions() {
@@ -195,8 +281,8 @@ public class FlyerActivity extends AppCompatActivity {
         String sun = week.get( timings.get(6).getDayOfWeek());
         opensAt = formatTime(timings.get(6).getOpensAt());
         closesAt = formatTime(timings.get(6).getClosesAt());
-        String sunTiming = sat + ": " + opensAt  + " - " + closesAt;
-        sunday.setText(satTiming);
+        String sunTiming = sun + ": " + opensAt  + " - " + closesAt;
+        sunday.setText(sunTiming);
 
     }
 
@@ -217,10 +303,10 @@ public class FlyerActivity extends AppCompatActivity {
         }
 
         protected void onPostExecute(ArrayList<Bitmap> result) {
-            int imageViewWidth = yelpImage.getWidth() ;
-            Bitmap fullBleed = ImageUtil.generateFullBleedBitmap(result.get(0),
-                    imageViewWidth, imageViewWidth/2);
-           yelpImage.setImageBitmap(fullBleed);
+//            int imageViewWidth = yelpImage.getWidth() ;
+//            Bitmap fullBleed = ImageUtil.generateFullBleedBitmap(result.get(0),
+//                    imageViewWidth, imageViewWidth/2);
+           yelpImage.setImageBitmap(result.get(0));
         }
     }
 }
