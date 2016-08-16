@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     public final static  String YELP_SECRET_KEY = "0i0nf5Y4C40qcUMfHrmOKeU2fq4A99hFAcEa4tQNlihVtuON97PnXrqTPEoKOdNK";
     public final static  String YELP_CLIENT_ID = "pho1XNCTeRxQVzWR_5vacg";
     public final static  String YELP_AUTH_URL = "https://api.yelp.com/oauth2/token";
+    
 
     @Bind(R.id.yelpUrl)
     protected EditText yelpUrlEditText;
@@ -55,8 +56,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Yelp doInBackground(String... params) {
             String accessToken =  getYelpAccessToken();
-            BusinessDetail yelpBusiness = getYelpBusinessData(accessToken);
-            ArrayList<Review> yelpReviews = getYelpReviews(accessToken);
+            String businessId = getYelpBusinessIdByPhone(accessToken);
+            BusinessDetail yelpBusiness = getYelpBusinessData(accessToken, businessId);
+            ArrayList<Review> yelpReviews = getYelpReviews(accessToken, businessId);
             return new Yelp(yelpBusiness, yelpReviews);
         }
 
@@ -93,12 +95,13 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        private BusinessDetail getYelpBusinessData(String accessToken) {
+        private BusinessDetail getYelpBusinessData(String accessToken, String businessId) {
             HttpURLConnection urlConnection = null;
+           // businessId = "north-india-restaurant-san-francisco";
 
             try {
                 //this is hardcoded now, we will get the value of the edit text box
-                URL url = new URL("https://api.yelp.com/v3/businesses/north-india-restaurant-san-francisco");
+                URL url = new URL("https://api.yelp.com/v3/businesses/" + businessId);
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
@@ -115,18 +118,40 @@ public class MainActivity extends AppCompatActivity {
             return null;
         }
 
-        private ArrayList<Review> getYelpReviews(String accessToken) {
+        private ArrayList<Review> getYelpReviews(String accessToken, String businessId) {
             HttpURLConnection urlConnection = null;
 
             try {
                 //this is hardcoded now, we will get the value of the edit text box
-                URL url = new URL("https://api.yelp.com/v3/businesses/north-india-restaurant-san-francisco/reviews");
+                URL url = new URL("https://api.yelp.com/v3/businesses/" + businessId + "/reviews");
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.setRequestProperty("Authorization", "Bearer " + accessToken);
                 JSONObject json = readInputStream(urlConnection.getInputStream());
                 return parseYelpReview(json);
+            } catch (IOException e) {
+                Log.e("MainActivity", "Error ", e);
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+            }
+            return null;
+        }
+
+        private String getYelpBusinessIdByPhone(String accessToken) {
+            HttpURLConnection urlConnection = null;
+
+            try {
+                //this is hardcoded now, we will get the value of the edit text box
+                URL url = new URL("https://api.yelp.com/v3/businesses/search/phone?phone=+14159083801");
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.setRequestProperty("Authorization", "Bearer " + accessToken);
+                JSONObject json = readInputStream(urlConnection.getInputStream());
+                return parseYelpBusinessId(json);
             } catch (IOException e) {
                 Log.e("MainActivity", "Error ", e);
             } finally {
@@ -159,6 +184,17 @@ public class MainActivity extends AppCompatActivity {
                     Log.e("PlaceholderFragment", "Error closing stream", e);
                 }
             }
+
+        }
+    }
+
+    protected String parseYelpBusinessId(JSONObject json) {
+        try {
+            JSONArray businessArray = json.getJSONArray("businesses");
+            JSONObject firstBusiness = (JSONObject) businessArray.get(0);
+            return firstBusiness.has("id") ? firstBusiness.get("id").toString() : null;
+        } catch(Exception e) {
+            return null;
 
         }
     }

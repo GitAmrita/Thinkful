@@ -3,4 +3,11 @@
     <string name="yelp_hint">Enter yelp url</string>
     <string name="go">GO</string>
     <string name="title_activity_flyer">FlyerActivity</string>
+    <string name="call_for_time">Please call us for timimg</string>
+    <string name="weekday">Mon - Fri: </string>
+    <string name="sat_closed">Sat: Closed</string>
+    <string name="sun_closed">Sun: Closed</string>
+    <string name="am">am</string>
+    <string name="pm">pm</string>
+    <string name="noon">noon</string>
 </resources>

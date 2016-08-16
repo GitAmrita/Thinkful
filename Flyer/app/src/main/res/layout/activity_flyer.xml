@@ -97,16 +97,7 @@
             android:orientation="vertical"
             android:layout_marginTop="10dp">
 
-            <TextView
-                android:id="@+id/hoursOfOperation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
-                android:layout_marginLeft="5dp"
-                android:text="Hours of Operation"
-                android:gravity="center_horizontal"
-                android:textSize="20dp" />
+
 
             <TextView
                 android:id="@+id/timingWeekdays"

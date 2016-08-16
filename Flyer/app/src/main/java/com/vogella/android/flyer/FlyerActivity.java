@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
@@ -26,7 +27,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -140,18 +143,16 @@ public class FlyerActivity extends AppCompatActivity {
     }
 
     private void shareItWrapper() {
-        try {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             int REQUEST_CODE_ASK_PERMISSIONS = 123;
-            int hasWriteExternalStoragePermission = checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            int hasWriteExternalStoragePermission = checkSelfPermission(
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE);
             if (hasWriteExternalStoragePermission != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         REQUEST_CODE_ASK_PERMISSIONS);
-                return;
             }
-            shareIt();
-        } catch(NoSuchMethodError e) {
-            shareIt();
         }
+        shareIt();
     }
 
     public boolean saveBitmapToFile(File dir, String fileName, Bitmap bm,
@@ -261,37 +262,69 @@ public class FlyerActivity extends AppCompatActivity {
         yelpReview.setText(reviewsTotal);
     }
 
-    private void setHoursOfOperation(BusinessDetail business) {
+    private String[] getWeekendTimings(Map<Integer, String> weekendTiming) {
+        String[] s = new String[] { getResources().getString(R.string.sat_closed),
+                getResources().getString(R.string.sun_closed)
+        };
+        int sat = 5;
+        int sun = 6;
 
+        if(weekendTiming.get(sat) != null) {
+            s[0] = weekendTiming.get(sat);
+        }
+        if(weekendTiming.get(sun) != null) {
+            s[1] = weekendTiming.get(sun);
+        }
+        return s;
+    }
+
+    private void setHoursOfOperation(BusinessDetail business) {
+        int weekDayCount = 0;
+        Map<Integer, String> weekendTiming = new HashMap<>();
+        Set weekdayTimings = new HashSet();
         ArrayList<OperationHour> hours = business.getOperationHours();
         ArrayList<OpenAndCloseTime> timings = hours.get(0).getOpenAndCloseTimes();
-        String monToFri = week.get( timings.get(0).getDayOfWeek())
-                + " - " + week.get( timings.get(4).getDayOfWeek());
-        String opensAt = formatTime(timings.get(0).getOpensAt());
-        String closesAt = formatTime(timings.get(0).getClosesAt());
-        String weekdayTiming = monToFri + ": " + opensAt  + " - " + closesAt;
-        weekDays.setText(weekdayTiming);
-
-        String sat = week.get( timings.get(5).getDayOfWeek());
-        opensAt = formatTime(timings.get(5).getOpensAt());
-        closesAt = formatTime(timings.get(5).getClosesAt());
-        String satTiming = sat + ": " + opensAt  + " - " + closesAt;
-        saturday.setText(satTiming);
-
-        String sun = week.get( timings.get(6).getDayOfWeek());
-        opensAt = formatTime(timings.get(6).getOpensAt());
-        closesAt = formatTime(timings.get(6).getClosesAt());
-        String sunTiming = sun + ": " + opensAt  + " - " + closesAt;
-        sunday.setText(sunTiming);
-
+        for(OpenAndCloseTime timing : timings) {
+            String opensAt = formatTime(timing.getOpensAt());
+            String closesAt = formatTime(timing.getClosesAt());
+            //if: weekday timings else: weekend timings
+            if(timing.getDayOfWeek() >= 0 && timing.getDayOfWeek() < 5) {
+                weekDayCount ++;
+                weekdayTimings.add(opensAt  + " - " + closesAt);
+            } else {
+                weekendTiming.put(timing.getDayOfWeek(), opensAt  + " - " + closesAt);
+            }
+        }
+        //make sure all 5 days of the week mon - fri have same timing
+        if(weekDayCount == 5 && weekdayTimings.size() == 1) {
+            weekDays.setText(getResources().getString(R.string.weekday) + " " +
+                    weekdayTimings.toArray()[0].toString());
+            String[] weekendTimings = getWeekendTimings(weekendTiming);
+            saturday.setText(weekendTimings[0]);
+            sunday.setText(weekendTimings[1]);
+        } else {
+            weekDays.setText(getResources().getString(R.string.call_for_time)) ;
+        }
     }
 
     private String formatTime(String time) {
-        float f = Float.parseFloat(time.substring(0, 2));
-        String clock = f <= 11 ? " am" : " pm";
-        String hours = String.valueOf(f <= 11 ? time.substring(0, 2) : f % 12);
-        String min = time.substring(2, 4);
-        return hours.substring(0, 2) + ":" + min + clock;
+        return formatHours(time) + ":" + time.substring(2, 4) +
+                getAMorPM(Integer.parseInt(time.substring(0, 2)));
+    }
+
+    private String getAMorPM(int time) {
+        return   " " + (time <= 11 ? getResources().getString(R.string.am) :
+                getResources().getString(R.string.pm));
+    }
+
+    private String formatHours(String time) {
+        String hour = time.substring(0, 2);
+        //replace 24 hr with 12 hr
+        hour = String.valueOf(Integer.parseInt(hour) <= 11 ? hour : Integer.parseInt(hour) % 12);
+        // hr == 00 : 12 am hr == 0 : 12 pm
+        hour = hour.equals("00") || hour.equals("0") ? "12" : hour;
+        hour = hour.charAt(0) == '0' ? String.valueOf(hour.charAt(1)): hour;
+        return hour;
     }
 
     private class DownloadImageTask extends AsyncTask<ArrayList<String>, Void, ArrayList<Bitmap>> {
