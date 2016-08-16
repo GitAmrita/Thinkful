@@ -23,8 +23,6 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,9 +35,11 @@ import butterknife.OnClick;
 
 public class FlyerActivity extends AppCompatActivity {
 
+    //1.7 is the aspect ratio we need for the business card
+    private final static  double FLYER_ASPECT_RATIO = 1.7;
+    private final static String TAG = "FLYER_ACTIVITY";
     private static final Map<Integer, String> week;
-    static
-    {
+    static {
         week = new HashMap();
         week.put(0, "Mon");
         week.put(1, "Tue");
@@ -99,94 +99,28 @@ public class FlyerActivity extends AppCompatActivity {
         yelpReview.setTypeface(oswald);
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
+
     @OnClick(R.id.shareBtnOnClick)
     public void onClick() {
         shareItWrapper();
     }
-    private void saveJpeg(){
-        layout.setDrawingCacheEnabled(true);
-        layout.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
-                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-        layout.layout(0, 0, layout.getMeasuredWidth(), layout.getMeasuredHeight());
-        layout.buildDrawingCache(true);
-        Bitmap b = Bitmap.createBitmap(layout.getDrawingCache());
-        layout.setDrawingCacheEnabled(false); // clear drawing cache
 
-        File dir = new File(Environment.getExternalStorageDirectory() + File.separator + "Pictures");
-
-        boolean doSave = true;
-        if (!dir.exists()) {
-            doSave = dir.mkdirs();
-        }
-
-        if (doSave) {
-            saveBitmapToFile(dir,"flyer.jpg",b,Bitmap.CompressFormat.JPEG,100);
-        }
-        else {
-            Log.e("app","Couldn't create target directory.");
-        }
-    }
-
-    private void shareIt() {
-        //sharing implementation here
-        saveJpeg();
-        String shareBody = "Here is the share content body";
-        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-        sharingIntent.setType("image/jpeg");
-        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "I am Doge!");
-        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, "Bork bork bork.");
-        String imagePath = Environment.getExternalStorageDirectory()+ File.separator + "Pictures" + File.separator + "flyer.jpg";
-        File imageFileToShare = new File(imagePath);
-        Uri uri = Uri.fromFile(imageFileToShare);
-        sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
-        startActivity(Intent.createChooser(sharingIntent, "Share your string using"));
-    }
-
-    private void shareItWrapper() {
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            int REQUEST_CODE_ASK_PERMISSIONS = 123;
-            int hasWriteExternalStoragePermission = checkSelfPermission(
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            if (hasWriteExternalStoragePermission != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        REQUEST_CODE_ASK_PERMISSIONS);
-            }
-        }
-        shareIt();
-    }
-
-    public boolean saveBitmapToFile(File dir, String fileName, Bitmap bm,
-                                    Bitmap.CompressFormat format, int quality) {
-
-        File imageFile = new File(dir,fileName);
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(imageFile);
-            bm.compress(format,quality,fos);
-            fos.close();
-            return true;
-        }
-        catch (IOException e) {
-            Log.e("app",e.getMessage());
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
-        }
-        return false;
+    private void getDataFromIntent() {
+        Intent intent = getIntent();
+        Yelp yelpBusiness = intent.getExtras().getParcelable(MainActivity.YELP_BUSINESS);
+        mBusiness = yelpBusiness.getYelpBusiness();
+        mReviews = yelpBusiness.getYelpReviews();
     }
 
     private void calculateLayoutDimensions() {
         Display display = getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics ();
         display.getMetrics(outMetrics);
-
-        float density  = getResources().getDisplayMetrics().density;
-        float dpHeight = outMetrics.heightPixels / density;
-        float dpWidth  = outMetrics.widthPixels / density;
 
         ViewTreeObserver vto = layout.getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -196,11 +130,10 @@ public class FlyerActivity extends AppCompatActivity {
                 int width  = layout.getMeasuredWidth();
                 int height = layout.getMeasuredHeight();
                 int requiredLayoutWidth = width;
-                //1.7 is the aspect ratio we need for the flyer
-                int requiredLayoutHeight = (int)(1.7 * width);
+                int requiredLayoutHeight = (int)(FLYER_ASPECT_RATIO * width);
                 if (requiredLayoutHeight > height) {
                     requiredLayoutHeight = height;
-                    requiredLayoutWidth = (int)(height / 1.7);
+                    requiredLayoutWidth = (int)(height / FLYER_ASPECT_RATIO);
                 }
 
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -217,27 +150,15 @@ public class FlyerActivity extends AppCompatActivity {
 
     }
 
-    private void getDataFromIntent() {
-        Intent intent = getIntent();
-        Yelp yelpBusiness = intent.getExtras().getParcelable(MainActivity.YELP_BUSINESS);
-        mBusiness = yelpBusiness.getYelpBusiness();
-        mReviews = yelpBusiness.getYelpReviews();
-    }
-
     private void setFlyerHeader(BusinessDetail business) {
         businessName.setText(business.getBusinessName());
 
         BusinessLocation location = business.getBusinessLocation();
-
-
-        String streetAddress = location.getAddress1() + location.getAddress2() +
+        String streetAddress = location.getAddress1() + " " + location.getAddress2() + " " +
                 location.getAddress3();
-
-        String city = location.getCity();
-
-        String address1 = String.format("%s %s", streetAddress, city);
-        String address2 = String.format("%s %s", location.getState(), location.getZipCode());
-
+        String address1 = String.format("%s", streetAddress);
+        String address2 = String.format("%s, %s %s",location.getCity(),
+                location.getState(), location.getZipCode());
         businessAddress1.setText(address1);
         businessAddress2.setText(address2);
 
@@ -258,24 +179,9 @@ public class FlyerActivity extends AppCompatActivity {
         float yelpRating = (float)business.getAverageRating();
         ratingBar.setRating(yelpRating);
 
-        String reviewsTotal = String.valueOf(business.getReviewCount()) + " reviews";
+        String reviewsTotal = String.valueOf(business.getReviewCount()) + " " +
+                getResources().getString(R.string.review);
         yelpReview.setText(reviewsTotal);
-    }
-
-    private String[] getWeekendTimings(Map<Integer, String> weekendTiming) {
-        String[] s = new String[] { getResources().getString(R.string.sat_closed),
-                getResources().getString(R.string.sun_closed)
-        };
-        int sat = 5;
-        int sun = 6;
-
-        if(weekendTiming.get(sat) != null) {
-            s[0] = weekendTiming.get(sat);
-        }
-        if(weekendTiming.get(sun) != null) {
-            s[1] = weekendTiming.get(sun);
-        }
-        return s;
     }
 
     private void setHoursOfOperation(BusinessDetail business) {
@@ -300,8 +206,8 @@ public class FlyerActivity extends AppCompatActivity {
             weekDays.setText(getResources().getString(R.string.weekday) + " " +
                     weekdayTimings.toArray()[0].toString());
             String[] weekendTimings = getWeekendTimings(weekendTiming);
-            saturday.setText(weekendTimings[0]);
-            sunday.setText(weekendTimings[1]);
+            saturday.setText(getResources().getString(R.string.sat_open) + " " + weekendTimings[0]);
+            sunday.setText(getResources().getString(R.string.sun_open) + " " + weekendTimings[1]);
         } else {
             weekDays.setText(getResources().getString(R.string.call_for_time)) ;
         }
@@ -325,6 +231,77 @@ public class FlyerActivity extends AppCompatActivity {
         hour = hour.equals("00") || hour.equals("0") ? "12" : hour;
         hour = hour.charAt(0) == '0' ? String.valueOf(hour.charAt(1)): hour;
         return hour;
+    }
+
+    private String[] getWeekendTimings(Map<Integer, String> weekendTiming) {
+        String[] s = new String[] { getResources().getString(R.string.sat_closed),
+                getResources().getString(R.string.sun_closed)
+        };
+        int sat = 5;
+        int sun = 6;
+        if(weekendTiming.get(sat) != null) {
+            s[0] = weekendTiming.get(sat);
+        }
+        if(weekendTiming.get(sun) != null) {
+            s[1] = weekendTiming.get(sun);
+        }
+        return s;
+    }
+
+    private void shareItWrapper() {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int REQUEST_CODE_ASK_PERMISSIONS = 123;
+            int hasWriteExternalStoragePermission = checkSelfPermission(
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            if (hasWriteExternalStoragePermission != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        REQUEST_CODE_ASK_PERMISSIONS);
+            }
+        }
+        shareIt();
+    }
+
+    private void shareIt() {
+        //sharing implementation here
+        saveJpeg();
+        String shareBody = getResources().getString(R.string.share_body);
+        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+        sharingIntent.setType("image/jpeg");
+        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
+                getResources().getString(R.string.share_subject));
+        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT,
+                getResources().getString(R.string.share_text));
+        String imagePath = Environment.getExternalStorageDirectory()+ File.separator + "Pictures" +
+                File.separator + "flyer.jpg";
+        File imageFileToShare = new File(imagePath);
+        Uri uri = Uri.fromFile(imageFileToShare);
+        sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        startActivity(Intent.createChooser(sharingIntent,
+                getResources().getString(R.string.share_intent)));
+    }
+
+    private void saveJpeg(){
+        layout.setDrawingCacheEnabled(true);
+        layout.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        layout.layout(0, 0, layout.getMeasuredWidth(), layout.getMeasuredHeight());
+        layout.buildDrawingCache(true);
+        Bitmap b = Bitmap.createBitmap(layout.getDrawingCache());
+        layout.setDrawingCacheEnabled(false); // clear drawing cache
+
+        File dir = new File(Environment.getExternalStorageDirectory() + File.separator + "Pictures");
+
+        boolean doSave = true;
+        if (!dir.exists()) {
+            doSave = dir.mkdirs();
+        }
+
+        if (doSave) {
+            ImageUtil.SaveBitmapToFile(dir,"flyer.jpg",b,Bitmap.CompressFormat.JPEG,100);
+        }
+        else {
+            Log.e(TAG,"Couldn't create target directory.");
+        }
     }
 
     private class DownloadImageTask extends AsyncTask<ArrayList<String>, Void, ArrayList<Bitmap>> {

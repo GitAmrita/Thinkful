@@ -1,13 +1,28 @@
 <resources>
     <string name="app_name">Flyer</string>
-    <string name="yelp_hint">Enter yelp url</string>
-    <string name="go">GO</string>
     <string name="title_activity_flyer">FlyerActivity</string>
+
+    <string name="yelp_hint">Enter yelp phone number/url</string>
+    <string name="go">GO</string>
+
     <string name="call_for_time">Please call us for timimg</string>
     <string name="weekday">Mon - Fri: </string>
     <string name="sat_closed">Sat: Closed</string>
     <string name="sun_closed">Sun: Closed</string>
+    <string name="sat_open">Sat: </string>
+    <string name="sun_open">Sun: </string>
     <string name="am">am</string>
     <string name="pm">pm</string>
-    <string name="noon">noon</string>
+
+    <string name="invalid_phone_number">Phone number is invalid</string>
+    <string name="input_not_registered">No business registered for your entry</string>
+
+    <string name="review">reviews</string>
+
+    <string name="in_progress">In progress...</string>
+
+    <string name="share_body">Here is the share content body</string>
+    <string name="share_subject">I am Doge!</string>
+    <string name="share_text">Bork bork bork.</string>
+    <string name="share_intent">Share your string using</string>
 </resources>

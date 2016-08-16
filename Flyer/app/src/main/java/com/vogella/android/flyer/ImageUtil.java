@@ -7,6 +7,9 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.util.Log;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
@@ -31,7 +34,7 @@ public class ImageUtil {
         return bitmaps;
     }
 
-    public static Bitmap generateFullBleedBitmap(Bitmap bitmap, int width, int height) {
+    public static Bitmap GenerateFullBleedBitmap(Bitmap bitmap, int width, int height) {
         Bitmap resultBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
         resultBitmap.eraseColor(Color.WHITE);
         Canvas canvas = new Canvas(resultBitmap);
@@ -64,5 +67,29 @@ public class ImageUtil {
         Rect src = new Rect(dstLeft, dstTop, dstRight, dstBottom);
         canvas.drawBitmap(bitmap, src, dstRectForRender, null);
         return resultBitmap;
+    }
+
+    public static boolean SaveBitmapToFile(File dir, String fileName, Bitmap bm,
+                                    Bitmap.CompressFormat format, int quality) {
+
+        File imageFile = new File(dir,fileName);
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(imageFile);
+            bm.compress(format,quality,fos);
+            fos.close();
+            return true;
+        }
+        catch (IOException e) {
+            Log.e("app",e.getMessage());
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        }
+        return false;
     }
 }
