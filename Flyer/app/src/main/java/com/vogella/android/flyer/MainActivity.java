@@ -41,8 +41,8 @@ public class MainActivity extends AppCompatActivity {
     public final static String YELP_ACCESS_TOKEN_ERROR = "YELP_ACCESS_TOKEN_ERROR";
 
 
-    @Bind(R.id.yelpUrl)
-    protected EditText yelpUrlEditText;
+    @Bind(R.id.userInput)
+    protected EditText yelpEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +52,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.go)
-    public void onClick() {
-        UserInput u = new UserInput(yelpUrlEditText.getText().toString().trim());
+    public void onGoClick() {
+        UserInput u = new UserInput(yelpEditText.getText().toString().trim());
         if (u.getInputType() == UserInput.BAD_INPUT ||  u.getInput().isEmpty()) {
             ErrorDetail e = new ErrorDetail(u.getInputType(), this);
             e.showErrorToast(e.getErrorMessage());
@@ -61,6 +61,16 @@ public class MainActivity extends AppCompatActivity {
             YelpResultTask webserviceTask = new YelpResultTask();
             webserviceTask.execute(u);
         }
+    }
+
+    @OnClick(R.id.urlInput)
+    public void onUrlClick() {
+        yelpEditText.setHint(getResources().getString(R.string.yelp_url_hint));
+    }
+
+    @OnClick(R.id.phoneInput)
+    public void onPhoneClick() {
+        yelpEditText.setHint(getResources().getString(R.string.yelp_phone_hint));
     }
 
     @Override
@@ -135,8 +145,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         }
     }
-
-
 
     private class YelpResultTask extends AsyncTask<UserInput, String, Yelp> {
 

@@ -1,9 +1,14 @@
 <resources>
-    <string name="app_name">Flyer</string>
-    <string name="title_activity_flyer">FlyerActivity</string>
+    <string name="app_name">Easy Flyer Maker</string>
 
-    <string name="yelp_hint">Enter yelp phone number/url</string>
-    <string name="go">GO</string>
+    <string name="yelp_phone_hint">(415) 788-9023</string>
+    <string name="yelp_url_hint">www.yelp.com/biz/mahalo-bowls-shop</string>
+    <string name="header_text_1">- Perfect half page flyer size</string>
+    <string name="header_text_2">- Create a flyer in one tap!</string>
+    <string name="header_text_3">- Sample flyer:</string>
+    <string name="phone">Phone</string>
+    <string name="yelp_url">url</string>
+    <string name="go">-></string>
 
     <string name="call_for_time">Please call us for timimg</string>
     <string name="weekday">Mon - Fri: </string>

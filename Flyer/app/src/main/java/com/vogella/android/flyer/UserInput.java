@@ -16,7 +16,6 @@ public class UserInput {
     public final static String URL_INPUT = "businessId";
     public final static String BAD_INPUT = "badInput";
     private final static String TAG = "USER_INPUT";
-    private final static char US_COUNTRY_CODE = '1';
     private final static String US_COUNTRY_CODE_FORMATTED = "+1";
 
     public String getInput() {
@@ -64,19 +63,15 @@ public class UserInput {
     }
 
     private String removeCountryCode(String phone) {
-        phone = phone.replace(" ","");
-        if (phone.length() <= 10) {
-            return phone;
+        String removedCountryCode = "";
+        for (char s : phone.toCharArray()) {
+            if (Character.isDigit(s)) {
+                removedCountryCode += s;
+            }
         }
-        else if (phone.charAt(0) == '+') { //+17652772890
-            return phone.substring(2, phone.length());
-        }
-        else if (phone.charAt(0) == US_COUNTRY_CODE && phone.charAt(3) == '.') {
-            return phone; //176.566.2567 - here 1 is not country code
-        }
-        else {
-            return phone.substring(1, phone.length());
-        }
+        int phoneNumberLength = removedCountryCode.length();
+        return phoneNumberLength > 10 ? removedCountryCode.substring(1, phoneNumberLength )
+                : removedCountryCode;
     }
 
     private boolean isValidPhone(String input) {
@@ -86,14 +81,8 @@ public class UserInput {
     }
 
     private String formatPhoneNumber(String phone) {
-        String formattedPhone = US_COUNTRY_CODE_FORMATTED;
-        for (char s : phone.toCharArray()) {
-            if (Character.isDigit(s)) {
-                formattedPhone += s;
-            }
-        }
-        return formattedPhone;
+        return US_COUNTRY_CODE_FORMATTED + phone;
     }
-    
+
 }
 

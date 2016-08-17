@@ -103,6 +103,7 @@ public class FlyerActivity extends AppCompatActivity {
     public void onBackPressed() {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
+        finish();
     }
 
     @OnClick(R.id.shareBtnOnClick)
