@@ -15,7 +15,10 @@
     <string name="pm">pm</string>
 
     <string name="invalid_phone_number">Phone number is invalid</string>
-    <string name="input_not_registered">No business registered for your entry</string>
+    <string name="invalid_yelp_url">yelp url is invalid</string>
+    <string name="yelp_access_token_error">yelp access token error</string>
+    <string name="bad_input">bad input </string>
+    <string name="default_error">default error</string>
 
     <string name="review">reviews</string>
 

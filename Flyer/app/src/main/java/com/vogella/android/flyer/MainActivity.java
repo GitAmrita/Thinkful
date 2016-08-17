@@ -4,9 +4,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -22,8 +20,6 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -42,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     public final static  String YELP_SEARCH_BY_PHONE = "https://api.yelp.com/v3/businesses/search/phone?phone=";
     public final static  String YELP_BUSINESS_API = "https://api.yelp.com/v3/businesses/";
     private final static String TAG = "MAIN_ACTIVITY";
+    public final static String YELP_ACCESS_TOKEN_ERROR = "YELP_ACCESS_TOKEN_ERROR";
 
 
     @Bind(R.id.yelpUrl)
@@ -58,7 +55,8 @@ public class MainActivity extends AppCompatActivity {
     public void onClick() {
         UserInput u = new UserInput(yelpUrlEditText.getText().toString().trim());
         if (u.getInputType() == UserInput.BAD_INPUT ||  u.getInput().isEmpty()) {
-            showErrorToast(getResources().getString(R.string.invalid_phone_number));
+            ErrorDetail e = new ErrorDetail(u.getInputType(), this);
+            e.showErrorToast(e.getErrorMessage());
         } else {
             YelpResultTask webserviceTask = new YelpResultTask();
             webserviceTask.execute(u);
@@ -68,10 +66,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         finish();
-    }
-
-    private void showErrorToast(String message) {
-        Toast.makeText(this, message,  Toast.LENGTH_LONG).show();
     }
 
     private JSONObject readInputStream(InputStream in) {
@@ -142,6 +136,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+
     private class YelpResultTask extends AsyncTask<UserInput, String, Yelp> {
 
         private Toast inProgressToast = null;
@@ -156,36 +152,37 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Yelp doInBackground(UserInput... params) {
+            ArrayList<ErrorDetail> errors = new ArrayList<>();
             UserInput input = params[0];
             String businessId;
 
             String accessToken =  getYelpAccessToken();
             if (accessToken == null) {
-                return null;
+                errors.add(new ErrorDetail(YELP_ACCESS_TOKEN_ERROR, MainActivity.this));
+                return new Yelp(null, null, errors);
             }
 
-            if (input.getInputType() == UserInput.PHONE_INPUT) {
-                businessId = getYelpBusinessIdByPhone(accessToken, input.getInput());
-            } else {
-                businessId = input.getInput();
-            }
-            if (businessId == null) {
-                return null;
-            }
+            businessId = input.getInputType() == UserInput.PHONE_INPUT
+                    ? getYelpBusinessIdByPhone(accessToken, input.getInput()) : input.getInput();
             BusinessDetail yelpBusiness = getYelpBusinessData(accessToken, businessId);
             if (yelpBusiness == null) {
-                return null;
+                errors.add(new ErrorDetail(input.getInputType(), MainActivity.this));
+                return new Yelp(null, null, errors);
             }
-            return new Yelp(yelpBusiness, null);
+            // for now we are not considering reviews so just sending reviews = null in yelp()
+            return new Yelp(yelpBusiness, null, null);
            /* ArrayList<Review> yelpReviews = getYelpReviews(accessToken, businessId);
             return new Yelp(yelpBusiness, yelpReviews); */
         }
 
+
         @Override
         protected void onPostExecute(Yelp business) {
             inProgressToast.cancel();
-            if (business == null) {
-                showErrorToast(getResources().getString(R.string.input_not_registered));
+            if (business.getYelpErrors() != null) {
+                Log.e(TAG, business.getYelpErrors().get(0).getMessage() );
+                ErrorDetail e = new ErrorDetail(MainActivity.this);
+                e.showErrorToast(business.getYelpErrors().get(0).getMessage());
             } else {
                 super.onPostExecute(business);
                 setYelpIntent(business);
@@ -280,6 +277,5 @@ public class MainActivity extends AppCompatActivity {
             }
             return null;
         }
-
     }
 }

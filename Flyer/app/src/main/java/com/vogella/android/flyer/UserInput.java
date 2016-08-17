@@ -41,10 +41,15 @@ public class UserInput {
     }
 
     private boolean isValidPhone(String input) {
-        //removing +country code
-        input = input.charAt(0) == '+' ? input.substring(2, input.length()) : input;
+        // allowing +countrycode in phone as valid and regex doesn't include that.
+        if (input.length() < 10) {
+            return false;
+        }
+        input = input.charAt(0) == '+'
+                ? input.substring(2, input.length())
+                : input;
         Pattern pattern = Pattern.compile(PHONE_REGEX);
-        Matcher matcher = pattern.matcher(input);
+        Matcher matcher = pattern.matcher(input.replace(" ",""));
         return matcher.matches();
     }
 
@@ -70,7 +75,7 @@ public class UserInput {
             yelpUrl = yelpUrl.startsWith("www.yelp.com") ? "https://" + yelpUrl : yelpUrl;
             URL url = new URL(yelpUrl);
             String[] parts = url.getFile().split("/");
-            return parts[2];
+            return parts.length >2 ? parts[2] : "";
         } catch(Exception e) {
             Log.e(TAG, "getBusinessIdFromUrl ", e );
         }

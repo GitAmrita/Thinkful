@@ -307,6 +307,12 @@ public class FlyerActivity extends AppCompatActivity {
     private class DownloadImageTask extends AsyncTask<ArrayList<String>, Void, ArrayList<Bitmap>> {
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            yelpImage.setBackgroundColor(getResources().getColor(R.color.Bg));
+        }
+
+        @Override
         protected ArrayList<Bitmap> doInBackground(ArrayList<String>... params) {
             ArrayList<String>  urls= params[0];
             return ImageUtil.DownloadBitmapFromUrl(urls);

@@ -61,7 +61,6 @@
             android:id="@+id/yelpImage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/editTextBg"
             android:scaleType="centerCrop" />
 
         <TextView
