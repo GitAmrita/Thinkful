@@ -80,6 +80,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="5dp"
+            android:isIndicator="true"
             android:paddingBottom="5dp"/>
 
         <TextView
