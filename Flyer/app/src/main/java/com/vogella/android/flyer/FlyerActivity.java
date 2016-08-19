@@ -301,18 +301,15 @@ public class FlyerActivity extends AppCompatActivity {
         layout.setDrawingCacheEnabled(true);
         layout.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
                 View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-        layout.layout(0, 0, layout.getMeasuredWidth(), layout.getMeasuredHeight());
         layout.buildDrawingCache(true);
         Bitmap b = Bitmap.createBitmap(layout.getDrawingCache());
         layout.setDrawingCacheEnabled(false); // clear drawing cache
 
         File dir = new File(Environment.getExternalStorageDirectory() + File.separator + "Pictures");
-
         boolean doSave = true;
         if (!dir.exists()) {
             doSave = dir.mkdirs();
         }
-
         if (doSave) {
             ImageUtil.SaveBitmapToFile(dir,"flyer.jpg",b,Bitmap.CompressFormat.JPEG,100);
         }
