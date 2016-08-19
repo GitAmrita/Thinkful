@@ -8,7 +8,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    android:background="@color/editTextBg"
+    android:background="@drawable/light_wood"
     tools:context="com.vogella.android.flyer.FlyerActivity">
 
     <LinearLayout android:orientation="vertical"
@@ -26,8 +26,8 @@
             android:paddingTop="5dp"
             android:paddingBottom="2dp"
             android:layout_marginLeft="5dp"
-            android:text="Mahalo Bowl Restaurant"
-            android:textSize="20dp" />
+            android:lineSpacingMultiplier="0.3"
+            android:textSize="23dp" />
 
         <TextView
             android:id="@+id/headerAddress1"
@@ -35,13 +35,13 @@
             android:layout_height="wrap_content"
             android:paddingBottom="2dp"
             android:layout_marginLeft="5dp"
-            android:text="705a W Dana Street, Mountain View,"
             android:textSize="15dp" />
 
         <TextView
             android:id="@+id/headerAddress2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="-5dp"
             android:paddingBottom="2dp"
             android:layout_marginLeft="5dp"
             android:text="CA 94041"
@@ -52,9 +52,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
-            android:textSize="20dp"
-            android:layout_marginBottom="20dp"
-            android:text="(650) 450-8244" />
+            android:textSize="18dp"
+            android:layout_marginBottom="5dp" />
 
         <ImageView
 
@@ -97,7 +96,15 @@
             android:orientation="vertical"
             android:layout_marginTop="10dp">
 
-
+            <TextView
+                android:id="@+id/timingCall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="20dp"
+                android:textSize="18dp"
+                android:visibility="gone"/>
 
             <TextView
                 android:id="@+id/timingWeekdays"

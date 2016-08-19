@@ -14,43 +14,44 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/header_text_1"
-        android:textStyle="bold"/>
+        android:lines="4"
+        android:gravity="center"
+        android:textSize="15dp"/>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/header_text_2"
-        android:textStyle="bold"/>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/header_text_3"
-        android:textStyle="bold"/>
 
     <ImageView
         android:layout_width="wrap_content"
-        android:layout_height="300dp"
-        android:src="@drawable/splash_2"
-        android:scaleType="centerCrop"
+        android:layout_height="wrap_content"
+        android:src="@drawable/sample"
         android:layout_marginTop="12dp"
+        android:layout_gravity="center_horizontal"
         android:layout_marginBottom="12dp"/>
 
-    <RadioGroup
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:id="@+id/inputText"
+        android:textSize="18dp"
+        android:gravity="center_horizontal"
+        android:text="@string/input"/>
 
-        <Button
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center_horizontal">
+
+        <RadioButton
             android:id="@+id/phoneInput"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="@string/phone"
             android:checked="true"
+            android:layout_marginRight="10dp"
             android:onClick="onPhoneClick"/>
 
-        <Button
+        <RadioButton
             android:id="@+id/urlInput"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -72,6 +73,8 @@
             android:layout_weight="6"
             android:layout_height="50dp"
             android:hint="@string/yelp_phone_hint"
+            android:textColorHint="@color/hintText"
+            android:paddingLeft="10dp"
             android:singleLine="true"
             android:background="@color/editTextBg"/>
 
@@ -83,7 +86,7 @@
             android:layout_gravity="right"
             android:text="@string/go"
             android:textSize="15dp"
-            android:background="@color/goBtn"
+            android:background="@color/button"
             android:onClick="onGoClick"/>
 
     </LinearLayout>

@@ -1,6 +1,8 @@
 package com.vogella.android.flyer;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -39,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
     public final static  String YELP_BUSINESS_API = "https://api.yelp.com/v3/businesses/";
     private final static String TAG = "MAIN_ACTIVITY";
     public final static String YELP_ACCESS_TOKEN_ERROR = "YELP_ACCESS_TOKEN_ERROR";
+    private final static String YELP_ACCESS_TOKEN = " ";
+    public static final String SHARED_PREFERENCES = "preferences" ;
 
 
     @Bind(R.id.userInput)
@@ -164,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
             UserInput input = params[0];
             String businessId;
 
-            String accessToken =  getYelpAccessToken();
+            String accessToken =  generateYelpAccessToken();
             if (accessToken == null) {
                 errors.add(new ErrorDetail(YELP_ACCESS_TOKEN_ERROR, MainActivity.this));
                 return new Yelp(null, null, errors);
@@ -199,6 +203,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
         private String getYelpAccessToken() {
+            String token = readYelpAccessTokenFromSharedPreferences();
+            if (token == null) {
+                token = generateYelpAccessToken();
+                writeYelpAccessTokenToSharedPreferences(token);
+            }
+            return token;
+        }
+
+        private String generateYelpAccessToken() {
             HttpURLConnection urlConnection = null;
             String postParameters = "grant_type=client_credentials&client_secret="
                     + YELP_SECRET_KEY + "&client_id=" + YELP_CLIENT_ID;
@@ -216,13 +229,28 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject json = readInputStream(urlConnection.getInputStream());
                 return parseAccessToken(json);
             } catch (IOException e) {
-                Log.e(TAG, "getYelpAccessToken  ", e);
+                Log.e(TAG, "generateYelpAccessToken  ", e);
                 return null;
             } finally {
                 if (urlConnection != null) {
                     urlConnection.disconnect();
                 }
             }
+        }
+
+        private void writeYelpAccessTokenToSharedPreferences(String token) {
+            SharedPreferences.Editor editor = getSharedPreferences(
+                    SHARED_PREFERENCES, MODE_PRIVATE).edit();
+            editor.clear();
+            editor.apply();
+            editor.putString(YELP_ACCESS_TOKEN, token);
+            editor.apply();
+        }
+
+        private String readYelpAccessTokenFromSharedPreferences() {
+            SharedPreferences prefs = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+            String token = prefs.getString(YELP_ACCESS_TOKEN, null);
+            return token;
         }
 
         private String getYelpBusinessIdByPhone(String accessToken, String phone) {

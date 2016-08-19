@@ -158,6 +158,6 @@
         android:id="@+id/go"
         android:layout_gravity="right"
         android:text="@string/go"
-        android:background="@color/goBtn" />
+        android:background="@color/button" />
 
 </LinearLayout>

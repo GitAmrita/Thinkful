@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -38,6 +39,7 @@ public class FlyerActivity extends AppCompatActivity {
     //1.7 is the aspect ratio we need for the business card
     private final static  double FLYER_ASPECT_RATIO = 1.7;
     private final static String TAG = "FLYER_ACTIVITY";
+    private final static int REQUEST_CODE_ASK_PERMISSIONS = 123;
     private static final Map<Integer, String> week;
     static {
         week = new HashMap();
@@ -69,6 +71,8 @@ public class FlyerActivity extends AppCompatActivity {
     protected RatingBar ratingBar;
     @Bind(R.id.yelpReview)
     protected TextView yelpReview;
+    @Bind(R.id.yelpRating)
+    protected TextView yelpRating;
 
     @Bind(R.id.timingWeekdays)
     protected TextView weekDays;
@@ -76,6 +80,8 @@ public class FlyerActivity extends AppCompatActivity {
     protected TextView saturday;
     @Bind(R.id.timingSunday)
     protected TextView sunday;
+    @Bind(R.id.timingCall)
+    protected TextView callForTiming;
 
     private BusinessDetail mBusiness;
     private ArrayList<Review> mReviews;
@@ -91,12 +97,7 @@ public class FlyerActivity extends AppCompatActivity {
         setYelpImages(mBusiness);
         setYelpRatings(mBusiness);
         setHoursOfOperation(mBusiness);
-        Typeface oswald = Typeface.createFromAsset(getAssets(),"fonts/Oswald-Regular.ttf");
-        businessName.setTypeface(oswald);
-        businessAddress1.setTypeface(oswald);
-        businessAddress2.setTypeface(oswald);
-        businessPhone.setTypeface(oswald);
-        yelpReview.setTypeface(oswald);
+        setTypeFace();
     }
 
     @Override
@@ -209,8 +210,10 @@ public class FlyerActivity extends AppCompatActivity {
             String[] weekendTimings = getWeekendTimings(weekendTiming);
             saturday.setText(getResources().getString(R.string.sat_open) + " " + weekendTimings[0]);
             sunday.setText(getResources().getString(R.string.sun_open) + " " + weekendTimings[1]);
+            callForTiming.setVisibility(View.GONE);
         } else {
-            weekDays.setText(getResources().getString(R.string.call_for_time)) ;
+            callForTiming.setText(getResources().getString(R.string.call_for_time)) ;
+            callForTiming.setVisibility(View.VISIBLE);
         }
     }
 
@@ -249,9 +252,22 @@ public class FlyerActivity extends AppCompatActivity {
         return s;
     }
 
+    private void setTypeFace() {
+        Typeface oswald = Typeface.createFromAsset(getAssets(),"fonts/Oswald-Regular.ttf");
+        businessName.setTypeface(oswald);
+        businessAddress1.setTypeface(oswald);
+        businessAddress2.setTypeface(oswald);
+        businessPhone.setTypeface(oswald);
+        yelpReview.setTypeface(oswald);
+        yelpRating.setTypeface(oswald);
+        weekDays.setTypeface(oswald);
+        saturday.setTypeface(oswald);
+        sunday.setTypeface(oswald);
+        callForTiming.setTypeface(oswald);
+    }
+
     private void shareItWrapper() {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            int REQUEST_CODE_ASK_PERMISSIONS = 123;
             int hasWriteExternalStoragePermission = checkSelfPermission(
                     Manifest.permission.WRITE_EXTERNAL_STORAGE);
             if (hasWriteExternalStoragePermission != PackageManager.PERMISSION_GRANTED) {

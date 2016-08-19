@@ -1,16 +1,15 @@
 <resources>
-    <string name="app_name">Easy Flyer Maker</string>
+    <string name="app_name">Easy Digital Business Flyer</string>
 
-    <string name="yelp_phone_hint">(415) 788-9023</string>
-    <string name="yelp_url_hint">www.yelp.com/biz/mahalo-bowls-shop</string>
-    <string name="header_text_1">- Perfect half page flyer size</string>
-    <string name="header_text_2">- Create a flyer in one tap!</string>
-    <string name="header_text_3">- Sample flyer:</string>
+    <string name="yelp_phone_hint">Example: (415) 788-9023</string>
+    <string name="yelp_url_hint">Example:  www.yelp.com/biz/mahalo-bowl</string>
+    <string name="header_text_1">Make a shareable image with your Yelp business information! To get started, enter either your business phone number or your Yelp URL below. Here\'s a sample of what you\'ll create:</string>
     <string name="phone">Phone</string>
     <string name="yelp_url">url</string>
+    <string name="input">Enter Business Phone # or Yelp URL:</string>
     <string name="go">-></string>
 
-    <string name="call_for_time">Please call us for timimg</string>
+    <string name="call_for_time">Call For Hours</string>
     <string name="weekday">Mon - Fri: </string>
     <string name="sat_closed">Sat: Closed</string>
     <string name="sun_closed">Sun: Closed</string>
@@ -30,7 +29,7 @@
     <string name="in_progress">In progress...</string>
 
     <string name="share_body">Here is the share content body</string>
-    <string name="share_subject">I am Doge!</string>
-    <string name="share_text">Bork bork bork.</string>
+    <string name="share_subject">Check out my Business Badge!</string>
+    <string name="share_text">Made using Easy Digital Business Flyer</string>
     <string name="share_intent">Share your string using</string>
 </resources>
