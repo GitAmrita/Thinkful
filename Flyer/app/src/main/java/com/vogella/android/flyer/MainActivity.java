@@ -3,11 +3,18 @@ package com.vogella.android.flyer;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Point;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
+import android.view.Gravity;
+import android.view.ViewTreeObserver;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 
@@ -45,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
     public static final String SHARED_PREFERENCES = "preferences" ;
 
 
+    @Bind(R.id.sampleImg)
+    protected ImageView sampleImage;
     @Bind(R.id.userInput)
     protected EditText yelpEditText;
 
@@ -53,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        calculateLayoutDimensions();
     }
 
     @OnClick(R.id.go)
@@ -80,6 +90,30 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         finish();
+    }
+
+    private void calculateLayoutDimensions() {
+        ViewTreeObserver vto = sampleImage.getViewTreeObserver();
+        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                sampleImage.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                Display display = getWindowManager().getDefaultDisplay();
+                Point size = new Point();
+                display.getSize(size);
+                int widthPx = size.x;
+                int heightPx = size.y;
+                // 0.6, 0.5 have been arbitarily chosen since such a layout looks good
+                int requiredLayoutWidth = (int)(0.6 * widthPx);
+                int requiredLayoutHeight = (int) (0.5 * heightPx);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        requiredLayoutWidth,requiredLayoutHeight);
+                params.gravity = Gravity.CENTER_HORIZONTAL;
+                params.topMargin = 10;
+                sampleImage.setLayoutParams(params);
+
+            }
+        });
     }
 
     private JSONObject readInputStream(InputStream in) {
