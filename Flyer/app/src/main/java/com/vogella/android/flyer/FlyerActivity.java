@@ -1,6 +1,8 @@
 package com.vogella.android.flyer;
 
 import android.Manifest;
+import android.annotation.TargetApi;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -10,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -22,6 +25,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.support.v7.app.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -268,14 +273,66 @@ public class FlyerActivity extends AppCompatActivity {
 
     private void shareItWrapper() {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            int hasWriteExternalStoragePermission = checkSelfPermission(
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            if (hasWriteExternalStoragePermission != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        REQUEST_CODE_ASK_PERMISSIONS);
+            shareItPermissionsForMarshmellowAndBeyond();
+        } else {
+            shareIt();
+        }
+    }
+
+   @TargetApi(Build.VERSION_CODES.M)
+    private void shareItPermissionsForMarshmellowAndBeyond() {
+        int hasWriteContactsPermission = checkSelfPermission(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
+
+            if (!shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE))
+            {
+                showMessageOKCancel(getResources().getString(R.string.share_permission_rationale),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                requestPermissions(new String[] {
+                                        Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                        REQUEST_CODE_ASK_PERMISSIONS);
+                            }
+                        });
+                return;
             }
+            requestPermissions(new String[] {
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    REQUEST_CODE_ASK_PERMISSIONS);
+            return;
         }
         shareIt();
+    }
+
+    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(this)
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_ASK_PERMISSIONS:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    shareIt();
+                } else {
+                    Toast.makeText(this
+                            ,getResources().getString(R.string.share_permission_denied)
+                            ,Toast.LENGTH_SHORT)
+                            .show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     private void shareIt() {

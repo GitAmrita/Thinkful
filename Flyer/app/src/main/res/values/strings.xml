@@ -18,10 +18,10 @@
     <string name="am">am</string>
     <string name="pm">pm</string>
 
-    <string name="invalid_phone_number">Invalid Phone Number. Try Again</string>
+    <string name="invalid_phone_number">Phone Number is not registered on yelp. Try Again</string>
     <string name="invalid_yelp_url">Invalid Yelp url. Try Again</string>
-    <string name="yelp_access_token_error">yelp access token error</string>
-    <string name="bad_input">Incorrect input.Try Again</string>
+    <string name="yelp_access_token_error">Internal error. Please try again later</string>
+    <string name="bad_input">Please enter a valid phone number or yelp url</string>
     <string name="default_error">default error</string>
 
     <string name="review">reviews</string>
@@ -32,4 +32,6 @@
     <string name="share_subject">Check out my Business Badge!</string>
     <string name="share_text">Made using Easy Digital Business Flyer</string>
     <string name="share_intent">Share your string using</string>
+    <string name="share_permission_rationale">You need to allow access to Storage</string>
+    <string name="share_permission_denied">Permission to storage denied</string>
 </resources>
