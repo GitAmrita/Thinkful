@@ -37,4 +37,5 @@ dependencies {
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.yelp.clientlib:yelp-android:2.0.0'
     compile 'com.android.support:design:23.4.0'
+    compile 'com.flurry.android:analytics:6.2.0'
 }

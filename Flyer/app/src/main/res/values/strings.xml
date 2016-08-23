@@ -7,7 +7,7 @@
     <string name="phone">Phone</string>
     <string name="yelp_url">url</string>
     <string name="input">Enter Business Phone # or Yelp URL:</string>
-    <string name="go">-></string>
+    <string name="go">--></string>
 
     <string name="call_for_time">Call For Hours</string>
     <string name="weekday">Mon - Fri: </string>

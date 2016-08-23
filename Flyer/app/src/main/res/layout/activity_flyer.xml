@@ -23,17 +23,16 @@
             android:id="@+id/headerBusiness"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="5dp"
-            android:paddingBottom="2dp"
+            android:paddingTop="1dp"
+            android:paddingBottom="1dp"
             android:layout_marginLeft="5dp"
-            android:lineSpacingMultiplier="0.3"
-            android:textSize="23dp" />
+            android:lineSpacingMultiplier="0.8"
+            android:textSize="20dp" />
 
         <TextView
             android:id="@+id/headerAddress1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="2dp"
             android:layout_marginLeft="5dp"
             android:textSize="15dp" />
 
@@ -93,6 +92,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/flyerFooter"
+            android:layout_weight="1"
             android:orientation="vertical"
             android:layout_marginTop="10dp">
 

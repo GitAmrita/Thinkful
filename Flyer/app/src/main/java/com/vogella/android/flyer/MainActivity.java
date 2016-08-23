@@ -1,13 +1,11 @@
 package com.vogella.android.flyer;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
@@ -17,6 +15,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+
+import com.flurry.android.FlurryAgent;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -36,21 +36,8 @@ import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
 
-    //phone api returned error: business id api and review api works
-    //https://api.yelp.com/v3/businesses/search/phone?phone=+16503866471
-    //https://www.yelp.com/biz/the-voya-restaurant-mountain-view
-
-    public final static  String YELP_BUSINESS = "";
-    public final static  String YELP_SECRET_KEY = "0i0nf5Y4C40qcUMfHrmOKeU2fq4A99hFAcEa4tQNlihVtuON97PnXrqTPEoKOdNK";
-    public final static  String YELP_CLIENT_ID = "pho1XNCTeRxQVzWR_5vacg";
-    public final static  String YELP_AUTH_URL = "https://api.yelp.com/oauth2/token";
-    public final static  String YELP_SEARCH_BY_PHONE = "https://api.yelp.com/v3/businesses/search/phone?phone=";
-    public final static  String YELP_BUSINESS_API = "https://api.yelp.com/v3/businesses/";
-    private final static String TAG = "MAIN_ACTIVITY";
-    public final static String YELP_ACCESS_TOKEN_ERROR = "YELP_ACCESS_TOKEN_ERROR";
-    private final static String YELP_ACCESS_TOKEN = " ";
     public static final String SHARED_PREFERENCES = "preferences" ;
-
+    private final static String TAG = "MAIN_ACTIVITY";
 
     @Bind(R.id.sampleImg)
     protected ImageView sampleImage;
@@ -63,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         calculateLayoutDimensions();
+        FlurryAgent.setLogEnabled(false);
+        FlurryAgent.init(this, Config.flurry.FLURRY_SESSION);
     }
 
     @OnClick(R.id.go)
@@ -103,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
                 display.getSize(size);
                 int widthPx = size.x;
                 int heightPx = size.y;
-                // 0.6, 0.5 have been arbitarily chosen since such a layout looks good
+                // 0.6, 0.5 have been arbitrarily chosen since such a layout looks good
                 int requiredLayoutWidth = (int)(0.6 * widthPx);
                 int requiredLayoutHeight = (int) (0.5 * heightPx);
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -111,7 +100,6 @@ public class MainActivity extends AppCompatActivity {
                 params.gravity = Gravity.CENTER_HORIZONTAL;
                 params.topMargin = 10;
                 sampleImage.setLayoutParams(params);
-
             }
         });
     }
@@ -179,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
     private void setYelpIntent(Yelp business) {
         if (business != null) {
             Intent intent = new Intent(this, FlyerActivity.class);
-            intent.putExtra(YELP_BUSINESS, business);
+            intent.putExtra(Config.api.YELP_BUSINESS, business);
             startActivity(intent);
         }
     }
@@ -204,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
 
             String accessToken =  generateYelpAccessToken();
             if (accessToken == null) {
-                errors.add(new ErrorDetail(YELP_ACCESS_TOKEN_ERROR, MainActivity.this));
+                errors.add(new ErrorDetail(Config.api.YELP_ACCESS_TOKEN_ERROR, MainActivity.this));
                 return new Yelp(null, null, errors);
             }
 
@@ -248,9 +236,9 @@ public class MainActivity extends AppCompatActivity {
         private String generateYelpAccessToken() {
             HttpURLConnection urlConnection = null;
             String postParameters = "grant_type=client_credentials&client_secret="
-                    + YELP_SECRET_KEY + "&client_id=" + YELP_CLIENT_ID;
+                    + Config.api.YELP_SECRET_KEY + "&client_id=" + Config.api.YELP_CLIENT_ID;
             try {
-                URL url = new URL(YELP_AUTH_URL);
+                URL url = new URL(Config.api.YELP_AUTH_URL);
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setDoOutput(true);
                 urlConnection.setRequestMethod("POST");
@@ -277,20 +265,20 @@ public class MainActivity extends AppCompatActivity {
                     SHARED_PREFERENCES, MODE_PRIVATE).edit();
             editor.clear();
             editor.apply();
-            editor.putString(YELP_ACCESS_TOKEN, token);
+            editor.putString(Config.api.YELP_ACCESS_TOKEN, token);
             editor.apply();
         }
 
         private String readYelpAccessTokenFromSharedPreferences() {
             SharedPreferences prefs = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
-            String token = prefs.getString(YELP_ACCESS_TOKEN, null);
+            String token = prefs.getString(Config.api.YELP_ACCESS_TOKEN, null);
             return token;
         }
 
         private String getYelpBusinessIdByPhone(String accessToken, String phone) {
             HttpURLConnection urlConnection = null;
             try {
-                URL url = new URL(YELP_SEARCH_BY_PHONE + phone);
+                URL url = new URL(Config.api.YELP_SEARCH_BY_PHONE + phone);
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
@@ -310,7 +298,7 @@ public class MainActivity extends AppCompatActivity {
         private BusinessDetail getYelpBusinessData(String accessToken, String businessId) {
             HttpURLConnection urlConnection = null;
             try {
-                URL url = new URL(YELP_BUSINESS_API + businessId);
+                URL url = new URL(Config.api.YELP_BUSINESS_API + businessId);
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
@@ -331,7 +319,7 @@ public class MainActivity extends AppCompatActivity {
             HttpURLConnection urlConnection = null;
 
             try {
-                URL url = new URL(YELP_BUSINESS_API + businessId + "/reviews");
+                URL url = new URL(Config.api.YELP_BUSINESS_API + businessId + "/reviews");
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");

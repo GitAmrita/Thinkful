@@ -41,8 +41,7 @@ import butterknife.OnClick;
 
 public class FlyerActivity extends AppCompatActivity {
 
-    //1.7 is the aspect ratio we need for the business card
-    private final static  double FLYER_ASPECT_RATIO = 1.7;
+
     private final static String TAG = "FLYER_ACTIVITY";
     private final static int REQUEST_CODE_ASK_PERMISSIONS = 123;
     private static final Map<Integer, String> week;
@@ -119,7 +118,7 @@ public class FlyerActivity extends AppCompatActivity {
 
     private void getDataFromIntent() {
         Intent intent = getIntent();
-        Yelp yelpBusiness = intent.getExtras().getParcelable(MainActivity.YELP_BUSINESS);
+        Yelp yelpBusiness = intent.getExtras().getParcelable(Config.api.YELP_BUSINESS);
         mBusiness = yelpBusiness.getYelpBusiness();
         mReviews = yelpBusiness.getYelpReviews();
     }
@@ -133,14 +132,14 @@ public class FlyerActivity extends AppCompatActivity {
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                layout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                layout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 int width  = layout.getMeasuredWidth();
                 int height = layout.getMeasuredHeight();
                 int requiredLayoutWidth = width;
-                int requiredLayoutHeight = (int)(FLYER_ASPECT_RATIO * width);
+                int requiredLayoutHeight = (int)(Config.flyer.FLYER_ASPECT_RATIO * width);
                 if (requiredLayoutHeight > height) {
                     requiredLayoutHeight = height;
-                    requiredLayoutWidth = (int)(height / FLYER_ASPECT_RATIO);
+                    requiredLayoutWidth = (int)(height / Config.flyer.FLYER_ASPECT_RATIO);
                 }
 
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(

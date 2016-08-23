@@ -85,7 +85,7 @@ public class ErrorDetail implements Parcelable{
             case UserInput.URL_INPUT :
                 message = context.getString(R.string.invalid_yelp_url);
                 break;
-            case MainActivity.YELP_ACCESS_TOKEN_ERROR :
+            case Config.api.YELP_ACCESS_TOKEN_ERROR :
                 message = context.getString(R.string.yelp_access_token_error);
                 break;
             default :
